@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cedrick Falconite | Security Researcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 255, 0, 0.02) 51%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 9999;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .terminal-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #00ff00;
+            animation: blink 1s infinite;
+            margin-left: 2px;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 5%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: flex-end;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #00ff00;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        nav a:hover {
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+        }
+
+        nav a::before {
+            content: '> ';
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover::before {
+            opacity: 1;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .matrix-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            font-family: 'Courier New', monospace;
+        }
+
+        .hero-content {
+            text-align: left;
+            z-index: 1;
+            max-width: 900px;
+            padding: 0 2rem;
+            border: 2px solid #00ff00;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 3rem;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        .terminal-header {
+            font-size: 0.9rem;
+            color: #00ff00;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .glitch {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #00ff00;
+            margin-bottom: 2rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .terminal-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .command-line {
+            color: #00ff00;
+            margin: 0.5rem 0;
+        }
+
+        .command-line::before {
+            content: '$ ';
+            color: #00ff00;
+        }
+
+        section {
+            padding: 5rem 10%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        h2::before {
+            content: '[root@cedrick ~]# ';
+            font-size: 1.2rem;
+            display: block;
+            opacity: 0.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .terminal-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            padding: 2rem;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+        }
+
+        .security-skills {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .security-skills li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+        }
+
+        .security-skills li::before {
+            content: '[✓] ';
+            color: #00ff00;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1.5rem;
+            border: 2px solid #00ff00;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        .stat-box:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            color: #00ff00;
+            font-weight: 700;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #00ff00;
+            margin-top: 0.5rem;
+            opacity: 0.8;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .project-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            padding: 2rem;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        .project-card:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+            transform: translateY(-10px);
+        }
+
+        .project-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .vulnerability-badge {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+            color: #ff0000;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .project-title {
+            font-size: 1.3rem;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .project-desc {
+            color: #00ff00;
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.3rem 0.8rem;
+            border: 1px solid #00ff00;
+            font-size: 0.8rem;
+            color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .contact-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .pgp-box {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff00;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .contact-method {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+
+        .contact-method:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .cve-wall {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff00;
+        }
+
+        .cve-item {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            font-family: 'Courier New', monospace;
+        }
+
+        .cve-item:last-child {
+            border-bottom: none;
+        }
+
+        .cve-id {
+            color: #ff0000;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        @media (max-width: 768px) {
+            .glitch { font-size: 2rem; }
+            .about-content { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: 1fr; }
+            section { padding: 3rem 5%; }
+            .hero-content { padding: 2rem; }
+        }
+
+        .typing {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end);
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+
+    <nav>
+        <ul>
+            <li><a href="#home">home</a></li>
+            <li><a href="#about">whoami</a></li>
+            <li><a href="#exploits">exploits</a></li>
+            <li><a href="#contact">contact</a></li>
+        </ul>
+    </nav>
+
+    <section id="home" class="hero">
+        <canvas class="matrix-bg" id="matrix"></canvas>
+        <div class="hero-content">
+            <div class="terminal-header">root@security:~#</div>
+            <h1 class="glitch">CEDRICK FALCONITE</h1>
+            <p class="subtitle">Security Researcher | Network Pentester | Vulnerability Hunter</p>
+            <div class="terminal-text">
+                <div class="command-line typing">cat /etc/passwd | grep cedrick</div>
+                <div style="opacity: 0.7; margin-top: 1rem;">
+                    "I don't break systems. I show you where they're already broken."
+                </div>
+                <div style="margin-top: 1.5rem; opacity: 0.8;">
+                    > Specializing in penetration testing, network security, and ethical hacking<br>
+                    > Current focus: Zero-day research and exploit development<br>
+                    > Philosophy: Every system has a vulnerability. It's just a matter of time.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <h2>whoami</h2>
+        <div class="about-content">
+            <div class="terminal-box">
+                <div style="opacity: 0.7; margin-bottom: 1rem;">$ cat about.txt</div>
+                <p style="margin-bottom: 1rem;">
+                    Security researcher with a passion for breaking things (legally). I spend my days hunting for vulnerabilities in networks and systems, and my nights learning new exploitation techniques.
+                </p>
+                <p style="margin-bottom: 1rem;">
+                    Started my journey by accidentally crashing my school's network. Now I get paid to find those kinds of weaknesses before the bad guys do.
+                </p>
+                <p>
+                    When I'm not pentesting, you'll find me reverse engineering malware, contributing to security tools, or documenting CVEs I've discovered.
+                </p>
+                
+                <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(0, 255, 0, 0.3);">
+                    <div style="opacity: 0.7;">$ ls skills/</div>
+                    <ul class="security-skills">
+                        <li>Penetration Testing (Web, Network, Mobile)</li>
+                        <li>Vulnerability Assessment & Exploitation</li>
+                        <li>Network Protocol Analysis</li>
+                        <li>Reverse Engineering</li>
+                        <li>Security Auditing & Compliance</li>
+                        <li>Malware Analysis</li>
+                        <li>OSINT & Social Engineering</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number">12+</div>
+                    <div class="stat-label">VULNERABILITIES DISCLOSED</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">CVEs ASSIGNED</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">PENTESTS COMPLETED</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">SECURITY MINDSET</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="exploits">
+        <h2>exploits & research</h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-header">
+                    <span class="vulnerability-badge">CRITICAL</span>
+                    <div class="project-title">SQL Injection in Enterprise CMS</div>
+                </div>
+                <div class="project-desc">
+                    Discovered and responsibly disclosed a critical SQL injection vulnerability in a widely-used enterprise CMS affecting 10,000+ installations. Led to CVE assignment and security patch.
+                </div>
+                <div class="project-tags">
+                    <span class="tag">SQLi</span>
+                    <span class="tag">CVE-2024-XXXX</span>
+                    <span class="tag">Responsible Disclosure</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-header">
+                    <span class="vulnerability-badge" style="background: rgba(255, 165, 0, 0.2); border-color: #ffa500; color: #ffa500; text-shadow: 0 0 5px #ffa500;">HIGH</span>
+                    <div class="project-title">Network Penetration Framework</div>
+                </div>
+                <div class="project-desc">
+                    Developed custom penetration testing toolkit for automated network reconnaissance and vulnerability scanning. Features modular architecture for various attack vectors.
+                </div>
+                <div class="project-tags">
+                    <span class="tag">Python</span>
+                    <span class="tag">Scapy</span>
+                    <span class="tag">Nmap</span>
+                    <span class="tag">Metasploit</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-header">
+                    <span class="vulnerability-badge">CRITICAL</span>
+                    <div class="project-title">Zero-Day in IoT Device</div>
+                </div>
+                <div class="project-desc">
+                    Identified authentication bypass in popular IoT camera system. Worked with vendor for coordinated disclosure. Resulted in firmware update pushed to 50,000+ devices.
+                </div>
+                <div class="project-tags">
+                    <span class="tag">IoT Security</span>
+                    <span class="tag">Firmware Analysis</span>
+                    <span class="tag">Auth Bypass</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-header">
+                    <span class="vulnerability-badge" style="background: rgba(255, 255, 0, 0.2); border-color: #ffff00; color: #ffff00; text-shadow: 0 0 5px #ffff00;">MEDIUM</span>
+                    <div class="project-title">XSS Vulnerability Scanner</div>
+                </div>
+                <div class="project-desc">
+                    Built automated XSS detection tool that crawls web applications and identifies potential cross-site scripting vulnerabilities using fuzzing techniques and payload libraries.
+                </div>
+                <div class="project-tags">
+                    <span class="tag">XSS</span>
+                    <span class="tag">Automation</span>
+                    <span class="tag">Web Security</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-header">
+                    <span class="vulnerability-badge" style="background: rgba(255, 165, 0, 0.2); border-color: #ffa500; color: #ffa500; text-shadow: 0 0 5px #ffa500;">HIGH</span>
+                    <div class="project-title">Network Protocol Fuzzer</div>
+                </div>
+                <div class="project-desc">
+                    Created fuzzing framework for testing network protocol implementations. Discovered multiple memory corruption bugs in industrial control systems.
+                </div>
+                <div class="project-tags">
+                    <span class="tag">Fuzzing</span>
+                    <span class="tag">Protocol Analysis</span>
+                    <span class="tag">C/C++</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-header">
+                    <span class="vulnerability-badge" style="background: rgba(255, 165, 0, 0.2); border-color: #ffa500; color: #ffa500; text-shadow: 0 0 5px #ffa500;">HIGH</span>
+                    <div class="project-title">Active Directory Exploitation Suite</div>
+                </div>
+                <div class="project-desc">
+                    Developed toolkit for assessing Active Directory security posture. Automates enumeration, identifies misconfigurations, and simulates privilege escalation paths.
+                </div>
+                <div class="project-tags">
+                    <span class="tag">Active Directory</span>
+                    <span class="tag">PowerShell</span>
+                    <span class="tag">Privilege Escalation</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cve-wall">
+            <div style="opacity: 0.7; margin-bottom: 1.5rem; font-family: 'Courier New', monospace;">$ cat cve_list.txt</div>
+            <div class="cve-item">
+                <span class="cve-id">CVE-2024-XXXXX</span> - SQL Injection in Enterprise CMS v3.2 [CVSS: 9.1]
+            </div>
+            <div class="cve-item">
+                <span class="cve-id">CVE-2023-XXXXX</span> - Authentication Bypass in IoT Camera Firmware [CVSS: 8.8]
+            </div>
+            <div class="cve-item">
+                <span class="cve-id">CVE-2023-XXXXX</span> - Remote Code Execution via Deserialization [CVSS: 9.8]
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>get in touch</h2>
+        <div class="contact-content">
+            <div class="terminal-box">
+                <p style="margin-bottom: 1rem;">
+                    Interested in collaboration, security research, or have a vulnerability to discuss? Reach out through secure channels below.
+                </p>
+                <p style="opacity: 0.8; font-size: 0.9rem;">
+                    > For vulnerability disclosures, please use encrypted communication<br>
+                    > Bug bounty tips welcome<br>
+                    > Always open to discussing security research
+                </p>
+            </div>
+
+            <div class="pgp-box">
+                <div style="opacity: 0.7; margin-bottom: 0.5rem;">$ cat pgp_public_key.asc</div>
+                -----BEGIN PGP PUBLIC KEY BLOCK-----<br><br>
+                mQINBGXXXXXXBEAC1234567890abcdefghijklmnopqrstuvwxyz...<br>
+                [Truncated for display - Full PGP key available on keyserver]<br><br>
+                -----END PGP PUBLIC KEY BLOCK-----
+            </div>
+
+            <div class="contact-methods">
+                <a href="mailto:cedrick@securemail.com" class="contact-method">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 0.5rem;">
+                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                        <path d="m2 7 10 7 10-7"/>
+                        <path d="M12 14L2 7" opacity="0.3"/>
+                    </svg>
+                    <div>ENCRYPTED EMAIL</div>
+                    <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">PGP Required</div>
+                </a>
+                <a href="https://github.com/cedrickfalconite" class="contact-method">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" style="margin-bottom: 0.5rem;">
+                        <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+                    </svg>
+                    <div>GITHUB</div>
+                    <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">Security Tools</div>
+                </a>
+                <a href="https://hackerone.com/cedrick" class="contact-method">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 0.5rem;">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                        <path d="M12 8v8m-4-4h8" opacity="0.5"/>
+                    </svg>
+                    <div>HACKERONE</div>
+                    <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">Bug Bounty Profile</div>
+                </a>
+                <a href="https://twitter.com/cedricksec" class="contact-method">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" style="margin-bottom: 0.5rem;">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <div>X (TWITTER)</div>
+                    <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">Security Updates</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Matrix rain effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = '01アイウエオカキクケコサシスセソタチツテト';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ff00';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Multiple glitch effects
+        const glitchText = document.querySelector('.glitch');
+        const original = glitchText.textContent;
+        const decryptChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        const binaryChars = '01';
+        const matrixChars = '01アイウエオカキクケコサシスセソタチツテト';
+        
+        // Effect 1: Decryption effect
+        function decryptEffect() {
+            let iterations = 0;
+            const interval = setInterval(() => {
+                glitchText.textContent = original
+                    .split('')
+                    .map((char, index) => {
+                        if (char === ' ') return ' ';
+                        if (index < iterations) return original[index];
+                        return decryptChars[Math.floor(Math.random() * decryptChars.length)];
+                    })
+                    .join('');
+                
+                iterations += 0.5;
+                if (iterations >= original.length) {
+                    clearInterval(interval);
+                    glitchText.textContent = original;
+                }
+            }, 50);
+        }
+
+        // Effect 2: Binary corruption effect
+        function binaryCorruptionEffect() {
+            let flickerCount = 0;
+            const maxFlickers = 8;
+            
+            const interval = setInterval(() => {
+                if (flickerCount % 2 === 0) {
+                    glitchText.textContent = original
+                        .split('')
+                        .map(char => {
+                            if (char === ' ') return ' ';
+                            return Math.random() > 0.7 ? char : binaryChars[Math.floor(Math.random() * 2)];
+                        })
+                        .join('');
+                } else {
+                    glitchText.textContent = original;
+                }
+                
+                flickerCount++;
+                if (flickerCount >= maxFlickers) {
+                    clearInterval(interval);
+                    glitchText.textContent = original;
+                }
+            }, 100);
+        }
+
+        // Effect 3: Matrix cascade effect
+        function matrixCascadeEffect() {
+            let position = 0;
+            const cascadeLength = 5;
+            
+            const interval = setInterval(() => {
+                glitchText.textContent = original
+                    .split('')
+                    .map((char, index) => {
+                        if (char === ' ') return ' ';
+                        if (index >= position && index < position + cascadeLength) {
+                            return matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                        }
+                        return char;
+                    })
+                    .join('');
+                
+                position++;
+                if (position >= original.length + cascadeLength) {
+                    clearInterval(interval);
+                    glitchText.textContent = original;
+                }
+            }, 60);
+        }
+
+        // Effect 4: Scramble and resolve effect
+        function scrambleEffect() {
+            let intensity = 1;
+            const maxIntensity = original.length;
+            
+            const interval = setInterval(() => {
+                if (intensity < maxIntensity) {
+                    // Scramble phase
+                    glitchText.textContent = original
+                        .split('')
+                        .map((char, index) => {
+                            if (char === ' ') return ' ';
+                            return Math.random() > (index / intensity) ? 
+                                decryptChars[Math.floor(Math.random() * decryptChars.length)] : char;
+                        })
+                        .join('');
+                    intensity += 0.8;
+                } else {
+                    clearInterval(interval);
+                    glitchText.textContent = original;
+                }
+            }, 40);
+        }
+
+        const effects = [decryptEffect, binaryCorruptionEffect, matrixCascadeEffect, scrambleEffect];
+        let effectIndex = 0;
+
+        // Trigger first effect on page load
+        setTimeout(() => {
+            effects[0]();
+            effectIndex = 1;
+        }, 500);
+
+        // Run 2 random effects every 10 seconds
+        setInterval(() => {
+            // First effect
+            const effect1 = effects[Math.floor(Math.random() * effects.length)];
+            effect1();
+            
+            // Second effect after 2 seconds
+            setTimeout(() => {
+                const effect2 = effects[Math.floor(Math.random() * effects.length)];
+                effect2();
+            }, 6000);
+        }, 10000);
+
+        // Hover effect: trigger 2 random effects
+        glitchText.addEventListener('mouseenter', () => {
+            const effect1 = effects[Math.floor(Math.random() * effects.length)];
+            effect1();
+            
+            setTimeout(() => {
+                const effect2 = effects[Math.floor(Math.random() * effects.length)];
+                effect2();
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
