@@ -225,16 +225,16 @@ const App = () => {
                 <div className="hero-content">
                     <div className="terminal-header">root@security:~#</div>
                     <h1 className="glitch">CEDRICK FALCONITE</h1>
-                    <p className="subtitle">Security Researcher | Network Pentester | Vulnerability Hunter</p>
+                    <p className="subtitle">IT Systems | Network Engineer | Software Ddeveloper</p>
                     <div className="terminal-text">
                         <div className="command-line typing">cat /etc/passwd | grep cedrick</div>
                         <div style={{ opacity: 0.7, marginTop: '1rem' }}>
-                            "I don't break systems. I show you where they're already broken."
+                            "Tech enthusiast skilled in IT support and network technology. Problem-solving pro with diverse
+                            programming abilities, dedicated to crafting innovative solutions"
                         </div>
                         <div style={{ marginTop: '1.5rem', opacity: 0.8 }}>
-                            &gt; Specializing in penetration testing, network security, and ethical hacking<br />
-                            &gt; Current focus: Zero-day research and exploit development<br />
-                            &gt; Philosophy: Every system has a vulnerability. It's just a matter of time.
+                            &gt; Specializing in IT Support, Network Technology & Software Development<br />
+                            &gt; Current focus: Cloud Support Engineer<br />
                         </div>
                     </div>
                 </div>
@@ -246,25 +246,24 @@ const App = () => {
                     <div className="terminal-box">
                         <div style={{ opacity: 0.7, marginBottom: '1rem' }}>$ cat about.txt</div>
                         <p style={{ marginBottom: '1rem' }}>
-                            Security researcher with a passion for breaking things (legally). I spend my days hunting for vulnerabilities in networks and systems, and my nights learning new exploitation techniques.
+                        I have a strong expertise in software development, networking, and IT support.  I've managed network configurations, worked with various systems, resolved technical problems, and created little tools to improve the efficiency of everyday chores over the years.  This combination of experience made it easier for me to comprehend how apps and infrastructure interact in real-world situations.  In order to contribute to the development of more dependable and scalable systems, I'm now concentrating on honing my automation and cloud technology skills.
                         </p>
-                        <p style={{ marginBottom: '1rem' }}>
-                            Started my journey by accidentally crashing my school's network. Now I get paid to find those kinds of weaknesses before the bad guys do.
-                        </p>
-                        <p>
-                            When I'm not pentesting, you'll find me reverse engineering malware, contributing to security tools, or documenting CVEs I've discovered.
-                        </p>
-                        
                         <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid rgba(0, 255, 0, 0.3)' }}>
                             <div style={{ opacity: 0.7 }}>$ ls skills/</div>
                             <ul className="security-skills">
-                                <li>Penetration Testing (Web, Network, Mobile)</li>
-                                <li>Vulnerability Assessment & Exploitation</li>
-                                <li>Network Protocol Analysis</li>
-                                <li>Reverse Engineering</li>
-                                <li>Security Auditing & Compliance</li>
-                                <li>Malware Analysis</li>
-                                <li>OSINT & Social Engineering</li>
+                                <li>Troubleshooting hardware and software issues</li>
+                                <li>System Administration</li>
+                                <li>Installing, configuring and maintaining applications</li>
+                                <li>Remote Support and diagnostics</li>
+                                <li>OS installation and imaging</li>
+                                <li>Basic Server Management</li>
+                                <li>Programming Languages (C++, Java & JavaScript,)</li>
+                                <li>Debugging and Testing</li>
+                                <li>Network Configuration</li>
+                                <li>Router, switch and firewall setup</li>
+                                <li>IP Addressing and subnetting</li>
+                                <li>Network troubleshooting</li>
+                                <li>Understanding security basic ports</li>
                             </ul>
                         </div>
                     </div>
