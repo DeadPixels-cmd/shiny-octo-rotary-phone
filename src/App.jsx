@@ -1,9 +1,30 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
+
+// Popup Component
+const Popup = ({ onClose, content }) => {
+    return (
+        <div className="popup-overlay" onClick={onClose}>
+            <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+                <div className="popup-header">
+                    <span className="popup-title">SQLi</span>
+                    <button className="popup-close" onClick={onClose}>×</button>
+                </div>
+                <div className="popup-body">
+                    {content}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const App = () => {
     const canvasRef = useRef(null);
+    const [isPopupVisible, setPopupVisible] = useState(false);
+
+    const showPopup = () => setPopupVisible(true);
+    const hidePopup = () => setPopupVisible(false);
 
     useEffect(() => {
         // Matrix rain effect
@@ -210,6 +231,10 @@ const App = () => {
 
     return (
         <div>
+            {isPopupVisible && <Popup 
+                onClose={hidePopup} 
+                content="SQL injection (SQLi) is a type of security vulnerability that allows an attacker to interfere with the queries that an application makes to its database." 
+            />}
             <div className="scanline"></div>
             <nav>
                 <ul>
@@ -294,13 +319,13 @@ const App = () => {
                     <div className="project-card">
                         <div className="project-header">
                         <span className="vulnerability-badge" style={{ background: 'rgba(255, 255, 0, 0.2)', borderColor: '#ffff00', color: '#ffff00', textShadow: '0 0 5px #ffff00' }}>CAPSTONE</span>
-                            <div className="project-title">SQL Injection in Enterprise CMS</div>
+                            <div className="project-title">Web Activated e-Coffee Brewer</div>
                         </div>
                         <div className="project-desc">
                             Discovered and responsibly disclosed a critical SQL injection vulnerability in a widely-used enterprise CMS affecting 10,000+ installations. Led to CVE assignment and security patch.
                         </div>
                         <div className="project-tags">
-                            <span className="tag">SQLi</span>
+                            <button className="tag" onClick={showPopup}>SQLi</button>
                             <span className="tag">CVE-2024-XXXX</span>
                             
                         </div>
@@ -415,6 +440,7 @@ const App = () => {
                         -----BEGIN PGP PUBLIC KEY BLOCK-----<br /><br />
                         mQINBGXXXXXXBEAC1234567890abcdefghijklmnopqrstuvwxyz...<br />
                         [Truncated for display - Full PGP key available on keyserver]<br /><br />
+ G
                         -----END PGP PUBLIC KEY BLOCK-----
                     </div>
 
