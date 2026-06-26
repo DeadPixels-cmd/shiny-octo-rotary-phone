@@ -374,7 +374,8 @@
         .cve-id {
             color: #ff0000;
             font-weight: bold;
-            text-shadow: 0 0 5px #ff0000;
+            text-shadow: 0 0 5px;
+            cursor: "pointer";
         }
 
         @media (max-width: 768px) {
@@ -412,12 +413,20 @@
         }
 
         .popup-content {
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(10, 10, 10, 0.95);
             border: 2px solid #00ff00;
             padding: 2rem;
             max-width: 600px;
             width: 90%;
             box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .popup-content.pdf-view {
+            max-width: 90vw;
+            width: 900px;
+            height: 90vh;
         }
 
         .popup-header {
@@ -427,6 +436,7 @@
             border-bottom: 1px solid rgba(0, 255, 0, 0.3);
             padding-bottom: 1rem;
             margin-bottom: 1rem;
+            flex-shrink: 0;
         }
 
         .popup-title {
@@ -447,4 +457,11 @@
             font-size: 1rem;
             color: #00ff00;
             opacity: 0.9;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .popup-body embed {
+            width: 100%;
+            height: 100%;
         }

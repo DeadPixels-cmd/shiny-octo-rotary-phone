@@ -1,18 +1,29 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
+import sqliImage from './assets/sqli.png';
+import cveReport from './assets/cve-report.pdf';
 
 // Popup Component
-const Popup = ({ onClose, content }) => {
+const Popup = ({ onClose, title, content, media }) => {
+    const isPdf = media && media.endsWith('.pdf');
+
     return (
         <div className="popup-overlay" onClick={onClose}>
-            <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+            <div className={`popup-content ${isPdf ? 'pdf-view' : ''}`} onClick={(e) => e.stopPropagation()}>
                 <div className="popup-header">
-                    <span className="popup-title">SQLi</span>
+                    <span className="popup-title">{title}</span>
                     <button className="popup-close" onClick={onClose}>×</button>
                 </div>
                 <div className="popup-body">
-                    {content}
+                    {media && (
+                        isPdf ? (
+                            <embed src={media} type="application/pdf" />
+                        ) : (
+                            <img src={media} alt={title} style={{ maxWidth: '100%', marginBottom: '1rem' }} />
+                        )
+                    )}
+                    {content && <div>{content}</div>}
                 </div>
             </div>
         </div>
@@ -22,11 +33,22 @@ const Popup = ({ onClose, content }) => {
 const App = () => {
     const canvasRef = useRef(null);
     const [isPopupVisible, setPopupVisible] = useState(false);
+    const [popupContent, setPopupContent] = useState('');
+    const [popupTitle, setPopupTitle] = useState('');
+    const [popupMedia, setPopupMedia] = useState(null);
 
-    const showPopup = () => setPopupVisible(true);
+    const showPopup = (title, content, media = null) => {
+        setPopupTitle(title);
+        setPopupContent(content);
+        setPopupMedia(media);
+        setPopupVisible(true);
+    };
     const hidePopup = () => setPopupVisible(false);
 
     useEffect(() => {
+        const glitchText = document.querySelector('.glitch');
+        if (!glitchText) return;
+
         // Matrix rain effect
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -76,7 +98,6 @@ const App = () => {
         });
 
         // Multiple glitch effects
-        const glitchText = document.querySelector('.glitch');
         const original = glitchText.textContent;
         const decryptChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         const binaryChars = '01';
@@ -233,7 +254,9 @@ const App = () => {
         <div>
             {isPopupVisible && <Popup 
                 onClose={hidePopup} 
-                content="SQL injection (SQLi) is a type of security vulnerability that allows an attacker to interfere with the queries that an application makes to its database." 
+                title={popupTitle}
+                content={popupContent}
+                media={popupMedia}
             />}
             <div className="scanline"></div>
             <nav>
@@ -259,7 +282,7 @@ const App = () => {
                         </div>
                         <div style={{ marginTop: '1.5rem', opacity: 0.8 }}>
                             &gt; Specializing in IT Support, Network Technology & Software Development<br />
-                            &gt; Current focus: Cloud Support Engineer<br />
+                            &gt; Current focus: DevOps <br />
                         </div>
                     </div>
                 </div>
@@ -319,45 +342,42 @@ const App = () => {
                     <div className="project-card">
                         <div className="project-header">
                         <span className="vulnerability-badge" style={{ background: 'rgba(255, 255, 0, 0.2)', borderColor: '#ffff00', color: '#ffff00', textShadow: '0 0 5px #ffff00' }}>CAPSTONE</span>
-                            <div className="project-title">Web Activated e-Coffee Brewer</div>
+                            <div className="project-title">Web Acticated e-coffee Brewer</div>
                         </div>
                         <div className="project-desc">
-                            Discovered and responsibly disclosed a critical SQL injection vulnerability in a widely-used enterprise CMS affecting 10,000+ installations. Led to CVE assignment and security patch.
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
                         </div>
                         <div className="project-tags">
-                            <button className="tag" onClick={showPopup}>SQLi</button>
-                            <span className="tag">CVE-2024-XXXX</span>
-                            
+                            <button className="tag" onClick={() => showPopup('SQLi', 'SQL injection (SQLi) is a type of security vulnerability that allows an attacker to interfere with the queries that an application makes to its database.', sqliImage)}>Book</button>
+                            <button className="tag" onClick={() => showPopup('CVE-2024-XXXX', 'This is a placeholder for a real CVE identifier. A CVE is a Common Vulnerabilities and Exposures identifier, which is a unique number assigned to a specific security vulnerability.', cveReport)}>Snapshots</button>
                         </div>
                     </div>
 
                     <div className="project-card">
                         <div className="project-header">
                             <span className="vulnerability-badge" style={{ background: 'rgba(255, 165, 0, 0.2)', borderColor: '#ffa500', color: '#ffa500', textShadow: '0 0 5px #ffa500' }}>PROJECT</span>
-                            <div className="project-title">Network Penetration Framework</div>
+                            <div className="project-title">Messenger App</div>
                         </div>
                         <div className="project-desc">
-                            Developed custom penetration testing toolkit for automated network reconnaissance and vulnerability scanning. Features modular architecture for various attack vectors.
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
                         </div>
                         <div className="project-tags">
-                            <span className="tag">Python</span>
-                            <span className="tag">Scapy</span>
-                            <span className="tag">Nmap</span>
-                            <span className="tag">Metasploit</span>
+                            <button className="tag" onClick={() => showPopup('Python', 'Python is a high-level, general-purpose programming language. Its design philosophy emphasizes code readability with the use of significant indentation.')}>View Code</button>
+                            <button className="tag" onClick={() => showPopup('Scapy', 'Scapy is a powerful Python program that enables the user to send, sniff and dissect and forge network packets. This capability allows construction of tools that can probe, scan or attack networks.')}>Demo Shots</button>
                         </div>
                     </div>
 
                     <div className="project-card">
                         <div className="project-header">
-                        <span className="vulnerability-badge" style={{ background: 'rgba(255, 165, 0, 0.2)', borderColor: '#ffa500', color: '#ffa500', textShadow: '0 0 5px #ffa500' }}>PROJECT</span>                            <div className="project-title">Zero-Day in IoT Device</div>
+                        <span className="vulnerability-badge" style={{ background: 'rgba(255, 165, 0, 0.2)', borderColor: '#ffa500', color: '#ffa500', textShadow: '0 0 5px #ffa500' }}>PROJECT</span><div className="project-title">E-Commerce Site in BatStateU</div>
                         </div>
                         <div className="project-desc">
                             Identified authentication bypass in popular IoT camera system. Worked with vendor for coordinated disclosure. Resulted in firmware update pushed to 50,000+ devices.
                         </div>
                         <div className="project-tags">
-                            <span className="tag">IoT Security</span>
-                            <span className="tag">Firmware Analysis</span>
-                            <span className="tag">Auth Bypass</span>
+                            <button className="tag" onClick={() => showPopup('IoT Security', 'IoT security is the practice of protecting Internet of Things devices and the networks they’re connected to.')}>Code</button>
+                            <button className="tag" onClick={() => showPopup('Firmware Analysis', 'Firmware analysis is the process of analyzing the firmware of a device to identify vulnerabilities.')}>Snapshots</button>
+                           
                         </div>
                     </div>
 
@@ -370,9 +390,9 @@ const App = () => {
                             Built automated XSS detection tool that crawls web applications and identifies potential cross-site scripting vulnerabilities using fuzzing techniques and payload libraries.
                         </div>
                         <div className="project-tags">
-                            <span className="tag">XSS</span>
-                            <span className="tag">Automation</span>
-                            <span className="tag">Web Security</span>
+                            <button className="tag" onClick={() => showPopup('XSS', 'Cross-site scripting (XSS) is a type of security vulnerability that allows an attacker to inject malicious scripts into web pages viewed by other users.')}>XSS</button>
+                            <button className="tag" onClick={() => showPopup('Automation', 'Automation is the use of technology to perform tasks with reduced human assistance.')}>Automation</button>
+                            <button className="tag" onClick={() => showPopup('Web Security', 'Web security is the practice of protecting websites and web applications from a variety of threats.')}>Web Security</button>
                         </div>
                     </div>
 
@@ -385,9 +405,9 @@ const App = () => {
                             Created fuzzing framework for testing network protocol implementations. Discovered multiple memory corruption bugs in industrial control systems.
                         </div>
                         <div className="project-tags">
-                            <span className="tag">Fuzzing</span>
-                            <span className="tag">Protocol Analysis</span>
-                            <span className="tag">C/C++</span>
+                            <button className="tag" onClick={() => showPopup('Fuzzing', 'Fuzzing is an automated software testing technique that involves providing invalid, unexpected, or random data as inputs to a computer program.')}>Fuzzing</button>
+                            <button className="tag" onClick={() => showPopup('Protocol Analysis', 'Protocol analysis is the process of analyzing the communication protocols between systems.')}>Protocol Analysis</button>
+                            <button className="tag" onClick={() => showPopup('C/C++', 'C and C++ are general-purpose programming languages that are widely used for systems programming.')}>C/C++</button>
                         </div>
                     </div>
 
@@ -400,23 +420,35 @@ const App = () => {
                             Developed toolkit for assessing Active Directory security posture. Automates enumeration, identifies misconfigurations, and simulates privilege escalation paths.
                         </div>
                         <div className="project-tags">
-                            <span className="tag">Active Directory</span>
-                            <span className="tag">PowerShell</span>
-                            <span className="tag">Privilege Escalation</span>
+                            <button className="tag" onClick={() => showPopup('Active Directory', 'Active Directory is a directory service developed by Microsoft for Windows domain networks.')}>Active Directory</button>
+                            <button className="tag" onClick={() => showPopup('PowerShell', 'PowerShell is a task automation and configuration management program from Microsoft, consisting of a command-line shell and the associated scripting language.')}>PowerShell</button>
+                            <button className="tag" onClick={() => showPopup('Privilege Escalation', 'Privilege escalation is the act of exploiting a bug, design flaw or configuration oversight in an operating system or software application to gain elevated access to resources that are normally protected from an application or user.')}>Privilege Escalation</button>
                         </div>
                     </div>
                 </div>
 
                 <div className="cve-wall">
-                    <div style={{ opacity: 0.7, marginBottom: '1.5rem', fontFamily: 'Courier New, monospace' }}>$ cat cve_list.txt</div>
+                    <div style={{ opacity: 0.7, marginBottom: '1.5rem', fontFamily: 'Courier New, monospace' }}>$ cat certificates.txt</div>
                     <div className="cve-item">
-                        <span className="cve-id">CVE-2024-XXXXX</span> - SQL Injection in Enterprise CMS v3.2 [CVSS: 9.1]
+                    <span className="cve-id"
+                        onClick={() => showPopup('Lorem Ipsum', 'Certificate 1 image')}
+                        style={{ cursor: "pointer"}}>
+                            CVE-2024-XXXXX
+                    </span> - Certificate 1 [CVSS: 9.1]
                     </div>
                     <div className="cve-item">
-                        <span className="cve-id">CVE-2023-XXXXX</span> - Authentication Bypass in IoT Camera Firmware [CVSS: 8.8]
+                    <span className="cve-id"
+                        onClick={() => showPopup('Lorem Ipsum', 'Certificate 1 image')}
+                        style={{ cursor: "pointer"}}>
+                            CVE-2023-XXXXX
+                    </span> - Certificate 2 [CVSS: 8.8]
                     </div>
                     <div className="cve-item">
-                        <span className="cve-id">CVE-2023-XXXXX</span> - Remote Code Execution via Deserialization [CVSS: 9.8]
+                    <span className="cve-id"
+                        onClick={() => showPopup('Lorem Ipsum', 'Certificate 1 image')}
+                        style={{ cursor: "pointer"}}>
+                            CVE-2023-XXXXX
+                    </span> - Certificate 3 [CVSS: 9.8]
                     </div>
                 </div>
             </section>
@@ -437,11 +469,12 @@ const App = () => {
 
                     <div className="pgp-box">
                         <div style={{ opacity: 0.7, marginBottom: '0.5rem' }}>$ cat pgp_public_key.asc</div>
-                        -----BEGIN PGP PUBLIC KEY BLOCK-----<br /><br />
-                        mQINBGXXXXXXBEAC1234567890abcdefghijklmnopqrstuvwxyz...<br />
-                        [Truncated for display - Full PGP key available on keyserver]<br /><br />
- G
-                        -----END PGP PUBLIC KEY BLOCK-----
+                        <div>
+                            -----BEGIN PGP PUBLIC KEY BLOCK-----<br /><br />
+                            mQINBGXXXXXXBEAC1234567890abcdefghijklmnopqrstuvwxyz...<br />
+                            [Truncated for display - Full PGP key available on keyserver]<br /><br />
+                            -----END PGP PUBLIC KEY BLOCK-----
+                        </div>
                     </div>
 
                     <div className="contact-methods">
